@@ -1,0 +1,81 @@
+.PostStreamToolbarWrapper {
+    pointer-events: none; // Prevent affecting areas left and right of the toolbar
+    position: fixed;
+    z-index: 800;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.PostStreamToolbar {
+    --post-toolbar-padding: 5px;
+
+    pointer-events: auto;
+    bottom: 0;
+    display: flex;
+    background: red;
+    background: var(--body-bg);
+    padding: var(--post-toolbar-padding);
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+
+    > .Button:not(:last-of-type) {
+        // We need to be careful with :last-child here because the tooltips insert new children when used
+        margin-right: var(--post-toolbar-padding);
+    }
+
+    > .FormControl, > .RelationshipSelect {
+        margin-right: var(--post-toolbar-padding);
+        max-width: 200px;
+    }
+}
+
+.PostStreamToolbar-push {
+    // Separator is not actually visible, it just pushes all flex items to the end after it
+    margin-right: auto;
+}
+
+.PostStreamToolbar-separator {
+    border-left: 1px solid var(--control-bg);
+    margin-right: var(--post-toolbar-padding);
+}
+
+@media @desktop-up {
+    // Same effect as applied to Flarum's .Composer, to align it with the post stream width
+    .PostStreamToolbar {
+        margin-left: -20px;
+        margin-right: 205px;
+    }
+}
+
+@media @desktop-hd {
+    .hasPane.panePinned .PostStreamToolbarWrapper {
+        left: var(--pane-width);
+    }
+}
+
+.PostStreamToolbarText {
+    color: var(--muted-color);
+    padding: 8px 13px; // Same as inputs and buttons
+    margin-right: var(--post-toolbar-padding);
+}
+
+.PostStream-filterNoResults {
+    color: var(--muted-color);
+    font-size: 1.2em;
+    padding: 60px 0;
+    text-align: center;
+    position: relative;
+
+    .icon {
+        position: absolute;
+        z-index: -10;
+        left: 65%;
+        top: 20px;
+        opacity: 0.2;
+        font-size: 100px;
+    }
+}
+
+.OriginalPosterBadge {
+    cursor: pointer;
+}

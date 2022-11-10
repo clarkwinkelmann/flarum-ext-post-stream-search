@@ -1,0 +1,45 @@
+{
+    "name": "clarkwinkelmann/flarum-ext-post-stream-search",
+    "description": "Filter post stream by keyword or other criteria.",
+    "keywords": [
+        "flarum",
+        "search",
+        "stream"
+    ],
+    "type": "flarum-extension",
+    "license": "MIT",
+    "require": {
+        "flarum/core": "^1.2",
+        "flamarkt/backoffice": "^0.1.2"
+    },
+    "authors": [
+        {
+            "name": "Clark Winkelmann",
+            "homepage": "https://clarkwinkelmann.com/",
+            "email": "clark.winkelmann@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/clarkwinkelmann/flarum-ext-post-stream-search"
+    },
+    "autoload": {
+        "psr-4": {
+            "ClarkWinkelmann\\PostStreamSearch\\": "src/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Post Stream Search",
+            "category": "feature",
+            "icon": {
+                "name": "fas fa-search",
+                "backgroundColor": "#684ba6",
+                "color": "#fff"
+            },
+            "optional-dependencies": [
+                "clarkwinkelmann/flarum-ext-scout"
+            ]
+        }
+    }
+}
