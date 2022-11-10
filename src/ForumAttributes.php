@@ -17,9 +17,9 @@ class ForumAttributes
     public function __invoke(ForumSerializer $serializer): array
     {
         return [
-            'post-stream-search.dropdownAccess' => $this->settings->get('post-stream-search.dropdownAccess'),
-            'post-stream-search.authorQuickFilter' => $this->settings->get('post-stream-search.authorQuickFilter'),
-            'post-stream-search.originalPosterBadge' => $this->settings->get('post-stream-search.originalPosterBadge'),
+            'post-stream-search.dropdownAccess' => (bool)$this->settings->get('post-stream-search.dropdownAccess'),
+            'post-stream-search.authorQuickFilter' => (bool)$this->settings->get('post-stream-search.authorQuickFilter'),
+            'post-stream-search.originalPosterBadge' => (bool)$this->settings->get('post-stream-search.originalPosterBadge'),
         ];
     }
 }
