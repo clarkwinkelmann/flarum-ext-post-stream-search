@@ -230,6 +230,9 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
 
         const allPostIds = this.discussion.postIds();
 
+        // If there is no text search, we switch the message to just say other users
+        const translation = 'clarkwinkelmann-post-stream-search.forum.stream.' + (this.stream.filterSearch ? 'unmatchedGap' : 'otherAuthorsGap');
+
         vdom.children.forEach(item => {
             if (!item.attrs || !item.attrs['data-id']) {
                 return;
@@ -246,7 +249,7 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
             // All the checks are done between current and next post
             // But for the very first we also need to check before
             if (indexInResults === 0 && indexInDiscussion > 0) {
-                item.children.unshift(m('.PostStream-timeGap', app.translator.trans('clarkwinkelmann-post-stream-search.forum.stream.unmatchedGap', {
+                item.children.unshift(m('.PostStream-timeGap', app.translator.trans(translation, {
                     count: indexInDiscussion,
                 })));
             }
@@ -270,7 +273,7 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
                 return;
             }
 
-            item.children.push(m('.PostStream-timeGap', app.translator.trans('clarkwinkelmann-post-stream-search.forum.stream.unmatchedGap', {
+            item.children.push(m('.PostStream-timeGap', app.translator.trans(translation, {
                 count: numberOfUnmatchedPostsBetween,
             })));
         });

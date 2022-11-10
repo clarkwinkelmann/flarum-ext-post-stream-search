@@ -10,7 +10,8 @@ clarkwinkelmann-post-stream-search:
     forum:
         stream:
             noResults: No posts match the search query in this discussion
-            unmatchedGap: '{count} non-matching posts hidden'
+            unmatchedGap: '{count, plural, one {One non-matching post hidden} other {{count} non-matching posts hidden}}'
+            otherAuthorsGap: '{count, plural, one {One post by another author hidden} other {{count} posts by other authors hidden}}'
         toolbar:
             searchPlaceholder: Find in discussion...
             authorPlaceholder: Filter by author...
