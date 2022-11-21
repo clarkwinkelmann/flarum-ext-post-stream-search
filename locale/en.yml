@@ -26,3 +26,6 @@ clarkwinkelmann-post-stream-search:
         post:
             opBadge: Discussion starter
             opBadgeTooltip: Click to only show replies from this user
+        cannotGoToPost:
+            message: Cannot go to post
+            action: Try clearing filters

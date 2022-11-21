@@ -95,14 +95,123 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
         return this.filteredPostIds.length;
     });
 
-    PostStreamState.prototype.applyFilters = function () {
+    override(PostStreamState.prototype, 'loadNearNumber', function (original, number) {
+        if (!Array.isArray(this.filteredPostIds)) {
+            return original(number);
+        }
+
+        if (this.posts().some((post) => post && Number(post.number()) === Number(number))) {
+            return Promise.resolve();
+        }
+
+        const suggestRemovingFilter = () => {
+            let alert: any;
+            const viewButton = Button.component({
+                className: 'Button Button--link',
+                onclick: () => {
+                    this.clearFilters(number);
+                    app.alerts.dismiss(alert);
+                },
+            }, app.translator.trans('clarkwinkelmann-post-stream-search.forum.cannotGoToPost.action'));
+
+            alert = app.alerts.show({
+                controls: [viewButton],
+            }, app.translator.trans('clarkwinkelmann-post-stream-search.forum.cannotGoToPost.message'));
+        }
+
+        const postExistsInStore = app.store.all<Post>('posts').some(post => Number(post.number()) === Number(number) && post.discussion() === this.discussion);
+
+        if (postExistsInStore) {
+            suggestRemovingFilter();
+
+            return Promise.resolve();
+        }
+
+        this.reset();
+
+        // Replicate what loadNearNumber did in a way that's compatible with the filtered data
+        return this.retrieveFilteredDiscussion(number).then(payload => {
+            const fullPosts: Post[] = [];
+            let numberFound = false;
+
+            payload.data.forEach(entry => {
+                if (entry.attributes) {
+                    const post = app.store.pushObject<Post>(entry)!;
+                    fullPosts.push(post);
+
+                    if (Number(post.number()) === Number(number)) {
+                        numberFound = true;
+                    }
+                }
+            });
+
+            this.show(fullPosts);
+
+            if (!numberFound) {
+                suggestRemovingFilter();
+            }
+        });
+    });
+
+    override(PostStreamState.prototype, 'update', function (original) {
+        if (!Array.isArray(this.filteredPostIds)) {
+            return original();
+        }
+
+        return new Promise<void>(resolve => {
+            // Retrieve the updated list of matching posts and then show the end
+            // It doesn't matter too much to load with the correct "near" value because this is used when writing
+            // a new post and the end is probably already loaded and the new post as well
+            // Even if we are not going to move in the discussion, it still made sense to refresh for the meta-data
+            this.retrieveFilteredDiscussion().then(() => {
+                original().then(() => {
+                    resolve();
+                });
+            });
+        });
+    });
+
+    PostStreamState.prototype.retrieveFilteredDiscussion = function (near?: number) {
+        const filter: any = {};
+
+        if (this.filterSearch) {
+            filter.q = this.filterSearch;
+        }
+
+        if (this.filterUsers.length > 0) {
+            filter.author = this.filterUsers.map(user => user.username()).join(',');
+        }
+
+        this.filterLoading = true;
+
+        return app.request<ApiPayloadPlural>({
+            method: 'GET',
+            url: app.forum.attribute('apiUrl') + '/discussions/' + this.discussion.id() + '/posts-search',
+            params: {
+                filter,
+                page: {
+                    near,
+                },
+            },
+        }).then(payload => {
+            this.filteredPostIds = [];
+
+            payload.data.forEach(entry => {
+                this.filteredPostIds!.push(entry.id);
+            });
+
+            this.filterLoading = false;
+
+            return payload;
+        });
+    }
+
+    PostStreamState.prototype.applyFilters = function (near?: number) {
         // We can't read the up to date value for near from m.route.param because the value is updated through history.replaceState
         const expectedPathPrefix = app.route.discussion(this.discussion) + '/';
         const urlPath = window.location.pathname;
 
-        let near: number | undefined = undefined;
-
-        if (urlPath.indexOf(expectedPathPrefix) === 0) {
+        if (!near && urlPath.indexOf(expectedPathPrefix) === 0) {
             near = parseInt(urlPath.substr(expectedPathPrefix.length));
         }
 
@@ -119,38 +228,13 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
             return;
         }
 
-        const filter: any = {};
-
-        if (this.filterSearch) {
-            filter.q = this.filterSearch;
-        }
-
-        if (this.filterUsers.length > 0) {
-            filter.author = this.filterUsers.map(user => user.username()).join(',');
-        }
-
-        this.filterLoading = true;
-
-        app.request<ApiPayloadPlural>({
-            method: 'GET',
-            url: app.forum.attribute('apiUrl') + '/discussions/' + this.discussion.id() + '/posts-search',
-            params: {
-                filter,
-                page: {
-                    near,
-                },
-            },
-        }).then(payload => {
-            this.filteredPostIds = [];
-
+        this.retrieveFilteredDiscussion(near).then(payload => {
             let closestPost: Post | null = null;
             let closestDistance = 1000;
 
             const fullPosts: Post[] = [];
 
             payload.data.forEach(entry => {
-                this.filteredPostIds!.push(entry.id);
-
                 // Not all entries in payload.data will be complete
                 if (entry.attributes) {
                     const post = app.store.pushObject<Post>(entry)!;
@@ -173,8 +257,6 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
                 }
             });
 
-            this.filterLoading = false;
-
             this.show(fullPosts);
 
             m.redraw();
@@ -189,11 +271,11 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
         });
     }
 
-    PostStreamState.prototype.clearFilters = function () {
+    PostStreamState.prototype.clearFilters = function (near?: number) {
         this.filterSearch = '';
         this.filterUsers = [];
 
-        this.applyFilters();
+        this.applyFilters(near);
     }
 
     window.addEventListener('keydown', function (event) {
