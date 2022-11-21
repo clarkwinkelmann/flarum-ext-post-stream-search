@@ -5,6 +5,15 @@
     bottom: 0;
     left: 0;
     right: 0;
+
+    @media @phone {
+        bottom: auto;
+        top: 46px; // Height of .App-navigation
+        z-index: ~'calc(var(--zindex-header) + 10)';
+        .container {
+            padding: 0;
+        }
+    }
 }
 
 .PostStreamToolbar {
@@ -18,6 +27,19 @@
     padding: var(--post-toolbar-padding);
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 
+    @media @phone {
+        // Same as .scrolled .App-navigation
+        box-shadow: 0 2px 6px var(--shadow-color);
+        flex-wrap: wrap;
+
+        // Push text to its own line on mobile
+        .PostStreamToolbarText, .LoadingIndicator-container {
+            order: 10;
+            width: 100%;
+            text-align: center;
+        }
+    }
+
     > .Button:not(:last-of-type) {
         // We need to be careful with :last-child here because the tooltips insert new children when used
         margin-right: var(--post-toolbar-padding);
@@ -26,6 +48,10 @@
     > .FormControl, > .RelationshipSelect {
         margin-right: var(--post-toolbar-padding);
         max-width: 200px;
+
+        @media @phone {
+            max-width: 150px;
+        }
     }
 }
 
