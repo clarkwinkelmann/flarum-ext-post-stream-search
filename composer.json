@@ -12,6 +12,10 @@
         "flarum/core": "^1.2",
         "flamarkt/backoffice": "^0.1.2"
     },
+    "suggest": {
+        "clarkwinkelmann/flarum-ext-advanced-search-highlight": "*",
+        "clarkwinkelmann/flarum-ext-scout": "*"
+    },
     "authors": [
         {
             "name": "Clark Winkelmann",

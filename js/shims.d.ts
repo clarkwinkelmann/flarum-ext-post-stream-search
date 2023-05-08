@@ -5,6 +5,10 @@ import {ApiPayloadPlural} from 'flarum/common/Store';
 
 declare module 'flarum/forum/states/PostStreamState' {
     export default interface PostStreamState {
+        // This attribute is part of clarkwinkelmann/flarum-ext-advanced-search-highlight API
+        // It should not be used to hold any state for this extension
+        // Instead, it should only be updated accordingly to make the feature in advanced-search-highlight work
+        highlightPostSearch?: string
         showToolbar: boolean
         filterSearch: string
         filterUsers: User[]

@@ -217,6 +217,7 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
 
         if (!this.filterSearch && this.filterUsers.length === 0) {
             this.filteredPostIds = null;
+            this.highlightPostSearch = undefined;
 
             if (near) {
                 // When clearing the search, we can be pretty sure the post that was visible while filtered will also be visible in the complete view
@@ -259,6 +260,8 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
 
             this.show(fullPosts);
 
+            this.highlightPostSearch = this.filterSearch;
+
             m.redraw();
 
             // These methods shouldn't load any more data since the target post is already loaded
@@ -279,20 +282,45 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
     }
 
     window.addEventListener('keydown', function (event) {
+        const stream = app.current.get('stream');
+
+        if (!stream) {
+            return;
+        }
+
         if ((event.ctrlKey || event.metaKey) && event.key === 'F' && app.current.matches(DiscussionPage)) {
-            const stream = app.current.get('stream');
+            event.preventDefault();
 
-            if (stream) {
-                event.preventDefault();
+            stream.showToolbar = true;
 
-                stream.showToolbar = true;
-                m.redraw();
+            const selection = window.getSelection().toString().trim();
 
-                setTimeout(() => {
-                    // Do this every time, even if the toolbar was already open
-                    $('.js-post-toolbar-autofocus').trigger('focus');
-                }, 0);
+            if (selection) {
+                stream.filterSearch = selection;
+                stream.applyFilters();
             }
+
+            m.redraw();
+
+            setTimeout(() => {
+                // Do this every time, even if the toolbar was already open
+                $('.js-post-toolbar-autofocus').trigger('focus').trigger('select');
+            }, 0);
+
+            // The quote button might not hide itself when we access the search via the keyboard shortcut
+            // We'll manually hide it similarly to how it hides itself on click
+            $('.Post-quoteButtonContainer .PostQuoteButton').hide();
+        }
+
+        if (event.key === 'Escape' && stream.showToolbar) {
+            const pinned = !!window.localStorage.getItem('showPostStreamToolbar');
+
+            if (!pinned) {
+                stream.showToolbar = false;
+                m.redraw();
+            }
+
+            stream.clearFilters();
         }
     });
 
