@@ -18,6 +18,7 @@ class ForumAttributes
     {
         return [
             'post-stream-search.dropdownAccess' => (bool)$this->settings->get('post-stream-search.dropdownAccess'),
+            'post-stream-search.sideNavAccess' => (bool)$this->settings->get('post-stream-search.sideNavAccess'),
             'post-stream-search.authorQuickFilter' => (bool)$this->settings->get('post-stream-search.authorQuickFilter'),
             'post-stream-search.originalPosterBadge' => (bool)$this->settings->get('post-stream-search.originalPosterBadge'),
         ];

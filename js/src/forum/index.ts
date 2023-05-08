@@ -11,6 +11,7 @@ import DiscussionControls from 'flarum/forum/utils/DiscussionControls';
 import PostControls from 'flarum/forum/utils/PostControls';
 import Post from 'flarum/common/models/Post';
 import icon from 'flarum/common/helpers/icon';
+import ItemList from 'flarum/common/utils/ItemList';
 import Toolbar from './components/Toolbar';
 
 app.initializers.add('clarkwinkelmann-post-stream-search', () => {
@@ -389,12 +390,9 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
         });
     });
 
-    extend(DiscussionControls, 'userControls', function (items) {
-        if (!app.forum.attribute('post-stream-search.dropdownAccess')) {
-            return;
-        }
-
+    function addToolbarButton(items: ItemList<any>, className: string = '') {
         items.add('filter-toolbar', Button.component({
+            className: 'Button--filter-toolbar' + (className ? ' ' + className : ''),
             onclick() {
                 const stream = app.current.get('stream');
 
@@ -408,6 +406,22 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
             },
             icon: 'fas fa-search',
         }, app.translator.trans('clarkwinkelmann-post-stream-search.forum.discussionControls.searchInDiscussion')));
+    }
+
+    extend(DiscussionControls, 'userControls', function (items) {
+        if (!app.forum.attribute('post-stream-search.dropdownAccess')) {
+            return;
+        }
+
+        addToolbarButton(items);
+    });
+
+    extend(DiscussionPage.prototype, 'sidebarItems', function (items) {
+        if (!app.forum.attribute('post-stream-search.sideNavAccess')) {
+            return;
+        }
+
+        addToolbarButton(items, 'Button');
     });
 
     extend(PostControls, 'userControls', function (items, post) {

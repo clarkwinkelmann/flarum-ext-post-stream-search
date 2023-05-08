@@ -11,6 +11,12 @@ app.initializers.add('clarkwinkelmann-post-stream-search', () => {
         })
         .registerSetting({
             type: 'switch',
+            setting: 'post-stream-search.sideNavAccess',
+            label: app.translator.trans('clarkwinkelmann-post-stream-search.admin.settings.sideNavAccess'),
+            help: app.translator.trans('clarkwinkelmann-post-stream-search.admin.settings.sideNavAccessHelp'),
+        })
+        .registerSetting({
+            type: 'switch',
             setting: 'post-stream-search.authorQuickFilter',
             label: app.translator.trans('clarkwinkelmann-post-stream-search.admin.settings.authorQuickFilter'),
             help: app.translator.trans('clarkwinkelmann-post-stream-search.admin.settings.authorQuickFilterHelp'),
