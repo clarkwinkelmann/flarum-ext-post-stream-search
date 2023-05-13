@@ -21,8 +21,11 @@ The sort order does not change, posts remain sorted chronologically.
 At the moment filters cannot be perma-linked.
 If the page is refreshed, the unfiltered page will be shown again.
 
-The matched keywords are currently not highlighted in the search results.
-The keywords could be found inside HTML attributes that aren't visible in the output.
+The matched keywords are not highlighted in the search results by default.
+This feature is provided by the [Advanced Search Highlight extension](https://github.com/clarkwinkelmann/flarum-ext-advanced-search-highlight).
+
+When using the default Flarum search (Scout not enabled), some of the same quirks as the Flarum search will apply: you will only get results when typing 3+ characters, and the search could match tokens that are part of the post source but not its output.
+When using Scout, those effects might not be present depending on the driver.
 
 ## Installation
 
@@ -31,6 +34,10 @@ You must enable Backoffice in the extension list before enabling this extension.
 The backoffice panel isn't used, you can ignore it.
 
     composer require clarkwinkelmann/flarum-ext-post-stream-search
+
+If you want search result highlighting, also install the following extension. It requires PHP 7.4+
+
+    composer require clarkwinkelmann/flarum-ext-advanced-search-highlight
 
 ## Support
 
